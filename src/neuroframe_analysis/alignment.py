@@ -11,7 +11,7 @@ from .dataclass import Misalignement
 # ================================================================
 # 1. Section: Obtaining the Mouse Alignment
 # ================================================================
-def get_misalignment(ct: np.ndarray, mri: np.ndarray, brain_mask: np.ndarray) -> Misalignement:
+def get_misalignment(ct: np.ndarray, brain_mask: np.ndarray) -> Misalignement:
     # 1. Extract the skull from the ct
     skull_threshold = threshold_otsu(ct[ct>0], 256)
     skull = np.where(ct > skull_threshold, 1, 0)
