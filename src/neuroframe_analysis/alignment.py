@@ -2,27 +2,26 @@
 # 0. Section: Imports
 # ================================================================
 import numpy as np
-import matplotlib.pyplot as plt
+from skimage.filters import threshold_otsu
+
+from .dataclass import Misalignement
 
 
 
 # ================================================================
 # 1. Section: Obtaining the Mouse Alignment
 # ================================================================
-def get_alignment(ct: np.ndarray, mri: np.ndarray, brain_mask: np.ndarray) -> float:
-    # 1. remove the brain in the mri with the brain mask
-    mri = np.where(brain_mask == 0, mri, 0)
+def get_misalignment(ct: np.ndarray, mri: np.ndarray, brain_mask: np.ndarray) -> Misalignement:
+    # 1. Extract the skull from the ct
+    skull_threshold = threshold_otsu(ct[ct>0], 256)
+    skull = np.where(ct > skull_threshold, 1, 0)
 
-    plt.figure()
-    plt.imshow(mri[:,:,50])
-    plt.show(block=False)
+    # 2. Compute overlap of brain on skull
+    overlap = skull * brain_mask
+    overlap_count = np.sum(overlap)
 
-    plt.figure()
-    plt.imshow(ct[:,:,50])
-    plt.show(block=True)
-    # 2. threshold both
-    # 3. Count the number of voxels in the smallest mask
-    # 4. Compute how many voxels overlap between mri and ct mask
-    # 5. Get a percentage of overlap regarding the smallest mask
-    # 6. The better the overlap the better the alignment
-    return 0.0
+    # 3. Compute the maximum possible overlap for % calculation
+    max_overlap = np.sum(skull)
+    misalignement = Misalignement(overlap_count, max_overlap, overlap_mask=overlap)
+
+    return misalignement
