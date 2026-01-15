@@ -4,12 +4,12 @@
 import numpy as np
 from skimage.filters import threshold_otsu
 
-from .dataclass import Misalignement
+from ..dataclass import Misalignement
 
 
 
 # ================================================================
-# 1. Section: Obtaining the Mouse Alignment
+# 1. Section: Obtaining the Mouse Misalignment
 # ================================================================
 def get_misalignment(ct: np.ndarray, brain_mask: np.ndarray) -> Misalignement:
     # 1. Extract the skull from the ct

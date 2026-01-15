@@ -4,7 +4,10 @@
 import os
 import numpy as np
 
-from neuroframe_analysis import Mouse, get_misalignment, soften_edge, get_folders
+from matplotlib import pyplot as plt
+
+from neuroframe_analysis import Mouse, get_misalignment, soften_edge, get_folders, plot_group_overlap_bar
+
 
 
 
@@ -37,3 +40,7 @@ for folder in folders:
 mean_misalignment = np.round(np.mean(misalignment_per_store), 2)
 std_misalignment = np.round(np.std(misalignment_per_store), 2)
 print(f"\nMean overlap: {mean_misalignment}% (std: {std_misalignment}%)")
+
+plot_group_overlap_bar(misalignment_per_store, folders)
+
+plt.show()
