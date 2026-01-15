@@ -6,7 +6,7 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 
-from neuroframe_analysis import Mouse, get_overlap, soften_edge, get_folders, plot_group_overlap_bar
+from neuroframe_analysis import Mouse, get_overlap, get_folders, plot_group_overlap_bar
 
 
 
@@ -26,7 +26,7 @@ for folder in folders:
     )
 
     # 2. Extract the data
-    brain_mask = soften_edge(mouse.segmentation.volume)
+    brain_mask = mouse.segmentation.volume
     ct = mouse.micro_ct.data
 
     # 3. Compute the misalignment

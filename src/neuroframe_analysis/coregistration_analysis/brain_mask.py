@@ -4,7 +4,7 @@
 import numpy as np
 
 from scipy.signal import fftconvolve
-from .utils import gaussian_kernel_3d
+from ..utils import gaussian_kernel_3d
 
 
 

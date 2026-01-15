@@ -6,6 +6,8 @@ import numpy as np
 from skimage.filters import threshold_otsu
 from scipy.ndimage import distance_transform_edt
 
+from .brain_mask import soften_edge
+
 from ..dataclass import Overlap
 
 
@@ -17,11 +19,14 @@ def get_overlap(ct: np.ndarray, brain_mask: np.ndarray) -> Overlap:
     # 1. Extract the skull from the ct
     skull = get_local_skull(ct, brain_mask)
 
-    # 2. Compute overlap of brain on skull
+    # 2. Softens the border between the brain and the skull
+    brain_mask = soften_edge(brain_mask)
+
+    # 3. Compute overlap of brain on skull
     overlap = skull * brain_mask
     overlap_count = np.sum(overlap)
 
-    # 3. Compute the maximum possible overlap for % calculation
+    # 4. Compute the maximum possible overlap for % calculation
     max_overlap = np.sum(skull)
     misalignement = Overlap(overlap_count, max_overlap, overlap_mask=overlap)
 
