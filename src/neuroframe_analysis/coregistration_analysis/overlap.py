@@ -3,11 +3,8 @@
 # ================================================================
 import numpy as np
 
-from matplotlib import pyplot as plt
 from skimage.filters import threshold_otsu
-from skimage.morphology import ball
 from scipy.ndimage import distance_transform_edt
-
 
 from ..dataclass import Overlap
 
