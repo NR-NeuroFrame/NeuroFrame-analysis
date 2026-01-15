@@ -28,10 +28,9 @@ for folder in folders:
     # 2. Extract the data
     brain_mask = soften_edge(mouse.segmentation.volume)
     ct = mouse.micro_ct.data
-    mri = mouse.mri.data
 
     # 3. Compute the misalignment
-    misalignement = get_overlap(ct, brain_mask, mri)
+    misalignement = get_overlap(ct, brain_mask)
     misalignment_per_store.append(misalignement.percentage_overlap())
     print(f"{mouse.id} had {misalignement.percentage_overlap()}% misalignment")
 
