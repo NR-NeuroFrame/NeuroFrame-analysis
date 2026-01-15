@@ -10,7 +10,6 @@ from neuroframe_analysis import Mouse, get_overlap, soften_edge, get_folders, pl
 
 
 
-
 # ================================================================
 # 1. Section: Computes the Group Misalignment
 # ================================================================
@@ -32,7 +31,7 @@ for folder in folders:
     mri = mouse.mri.data
 
     # 3. Compute the misalignment
-    misalignement = get_overlap(ct, brain_mask)
+    misalignement = get_overlap(ct, brain_mask, mri)
     misalignment_per_store.append(misalignement.percentage_overlap())
     print(f"{mouse.id} had {misalignement.percentage_overlap()}% misalignment")
 
