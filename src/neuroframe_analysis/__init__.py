@@ -1,11 +1,11 @@
 from matplotlib import pyplot as plt
 from .styling import *
 
-from .coregistration_analysis import get_overlap, plot_group_overlap_bar
+from .coregistration_analysis import get_overlap, plot_group_overlap_bar, get_holes
 from .mouse import Mouse
 from .utils import compress_nifty, get_folders
 
-__all__ = ["get_overlap",
+__all__ = ["get_overlap", "get_holes",
     "Mouse",
     "compress_nifty",
     "get_folders",
