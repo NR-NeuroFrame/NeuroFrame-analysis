@@ -1,141 +1,80 @@
+# ================================================================
+# 0. Section: Imports
+# ================================================================
 import numpy as np
 
-from matplotlib import pyplot as plt
-from scipy.ndimage import distance_transform_edt, label
+from scipy.ndimage import distance_transform_edt, label, binary_fill_holes, center_of_mass
 
 from ..logger import logger
-
+from ..utils import get_volume_center, get_voxels_on_line
 from .overlap import get_local_skull
+from .holes_dataclass import HolesDetails
 
 
 
-def get_holes(ct: np.ndarray, brain_mask: np.ndarray):
+# ================================================================
+# 0. Section: Hole Between Brain and Skull
+# ================================================================
+def get_holes(ct: np.ndarray, brain_mask: np.ndarray) -> HolesDetails:
     # 1. Get the local skull
     skull = get_local_skull(ct, brain_mask)
+    skull = binary_fill_holes(skull)
 
-    target_slice = (slice(None), slice(None), skull.shape[2]//2+20)
-    plt.figure()
-    plt.imshow(skull[target_slice])
-    plt.title("Local Skull")
-    plt.show(block=False)
-
-    # 2. Fill the skull (skull space)
-    skull_space = get_skull_space(skull, brain_mask)
-    plt.figure()
-    plt.imshow(skull_space[target_slice])
-    plt.title("Skull Space")
-    plt.show(block=False)
+    # 2. Get the border area mask (skull space)
+    skull_space = distance_transform_edt(~skull) <= 5
 
     # 3. Get all that is not skull, brain and is inside the skull space
     intersection = np.where(skull + brain_mask > 0, 1, 0)
-
-    plt.figure()
-    plt.imshow(intersection[target_slice])
-    plt.title("Intersection")
-    plt.show(block=False)
-
     possible_holes = np.where(skull_space != intersection, 1, 0)
 
-    plt.figure()
-    plt.imshow(possible_holes[target_slice])
-    plt.title("Possible Holes")
-    plt.show(block=False)
-
     # 4. Get the connected clusters
-    lab, n = label(possible_holes)
-    if n == 0: logger.critical("No clusters were found! cannot get skull space")
-    print(n)
-    lab = np.where(lab == 1, 0, lab)
+    clustered_holes, n = label(possible_holes)
+    if n == 0:
+        logger.critical("No clusters were found! Cannot get skull space")
 
-    """
-    sizes = np.bincount(lab.ravel())          # sizes[label_id]
-    keep = sizes >= 1
-    keep[0] = False                           # never keep background
+    # 5. Remove the excess mask (overshoot) and the holes that do not connect to the center
+    clustered_holes = np.where(clustered_holes == 1, 0, clustered_holes)
+    holes_mask = filter_for_skull_holes(clustered_holes, brain_mask, skull)
+    holes_labels = np.where(holes_mask, clustered_holes, 0)
 
-    filtered = keep[lab]                      # boolean mask of kept components
-    lab = lab * filtered
+    # 5. Count them and their size
+    hole_voxel_volume = int(np.sum(np.where(holes_mask > 0, 1, 0)))
+    nr_labels = len(np.unique(holes_labels))
+    return HolesDetails(holes_mask, hole_voxel_volume, nr_labels)
 
-    n = len(np.unique(lab))
-    print(n)
-    """
 
-    hole_space = np.nansum(np.where(lab > 0, 1, 0))
-    print(f"The space in between brain and skull is : {hole_space} voxels")
+# ──────────────────────────────────────────────────────
+# 1.1 Subsection: Hole Filters
+# ──────────────────────────────────────────────────────
+def filter_for_skull_holes(labels_img: np.ndarray, brain_mask: np.ndarray, skull: np.ndarray) -> np.ndarray:
+    brain_center = get_volume_center(brain_mask)
 
-    plt.figure()
-    plt.imshow(skull[target_slice], cmap="gray", alpha=0.2)
-    plt.imshow(np.where(lab[target_slice] == 0, np.nan, lab[target_slice]), cmap="hsv")
-    plt.title("All Clusters")
-    plt.show(block=False)
+    max_label = labels_img.max()
+    if max_label < 2:
+        return np.zeros_like(labels_img, dtype=bool)
 
-    target_slice = (slice(None), slice(None), skull.shape[2]//2)
-    plt.figure()
-    plt.imshow(skull[target_slice], cmap="gray", alpha=0.2)
-    plt.imshow(np.where(lab[target_slice] == 0, np.nan, lab[target_slice]), cmap="hsv")
-    plt.title("All Clusters")
-    plt.show(block=False)
+    # centers for labels 2..max_label in one call
+    idx = np.arange(2, max_label + 1)
+    # input can be ones; centers are computed per label region
+    centers = center_of_mass(np.ones_like(labels_img, dtype=np.uint8), labels=labels_img, index=idx)
 
-    target_slice = (skull.shape[0]//2, slice(None), slice(None))
-    plt.figure()
-    plt.imshow(skull[target_slice], cmap="gray", alpha=0.2)
-    plt.imshow(np.where(lab[target_slice] == 0, np.nan, lab[target_slice]), cmap="hsv")
-    plt.title("All Clusters")
-    plt.show(block=False)
+    kept = []
+    for lab, c in zip(idx, centers):
+        if np.isnan(c[0]):  # label absent (can happen)
+            continue
+        hole_center = tuple(np.rint(c).astype(int))
 
-    target_slice = (slice(None), skull.shape[1]//2, slice(None))
-    plt.figure()
-    plt.imshow(skull[target_slice], cmap="gray", alpha=0.2)
-    plt.imshow(np.where(lab[target_slice] == 0, np.nan, lab[target_slice]), cmap="hsv")
-    plt.title("All Clusters")
-    plt.show(block=True)
+        line = get_voxels_on_line(hole_center, brain_center)  # see section 3
+        if not check_line_intercect_skull(line, skull):
+            kept.append(lab)
 
-    # 5. Count them and their size (maybe use a dataclass)
-    pass
+    # single pass to build final mask
+    return np.isin(labels_img, kept)
 
-def get_skull_space(skull: np.ndarray, brain_mask: np.ndarray) -> np.ndarray:
-    # 1. Enlarge the brain mask
-    brain_mask = np.asanyarray(brain_mask, dtype=bool)
-    large_brain_mask = distance_transform_edt(~brain_mask) <= 10
+def check_line_intercect_skull(line: np.ndarray, skull: np.ndarray) -> bool:
+    line = np.asarray(line, dtype=int)
 
-    return large_brain_mask
+    z, y, x = line.T
+    hits = skull[z, y, x]
 
-    # 2. Subtract the skull to the enlarged brain mask
-    cluster_skull_zone = np.where(large_brain_mask - skull > 0, 1, 0)
-
-    # 3. Get the biggest connected component (skull space)
-    incomplete_skull_space = get_biggest_group(cluster_skull_zone)
-
-    # 4. Merge the incomplete skull space with skull again
-    closed_skull = np.where(incomplete_skull_space + skull > 0, 1, 0)
-
-    target_slice = (slice(None), slice(None), closed_skull.shape[2]//2)
-    plt.figure()
-    plt.imshow(cluster_skull_zone[target_slice])
-    plt.show(block=False)
-
-    plt.figure()
-    plt.imshow(incomplete_skull_space[target_slice])
-    plt.show(block=False)
-
-    plt.figure()
-    plt.imshow(closed_skull[target_slice])
-    plt.show()
-
-def get_biggest_group(cluster: np.ndarray) -> np.ndarray:
-    lab, n = label(cluster)
-    if n == 0: logger.critical("No clusters were found! cannot get skull space")
-
-    print(n)
-
-    target_slice = (slice(None), slice(None), lab.shape[2]//2)
-    plt.figure()
-    plt.imshow(lab[target_slice])
-    plt.show(block=False)
-
-    sizes = np.bincount(lab.ravel())
-    sizes[0] = 0  # ignore background
-    biggest_label = sizes.argmax()
-
-    biggest_label = np.where(lab == biggest_label, 1, 0)
-
-    return biggest_label
+    return np.any(hits)

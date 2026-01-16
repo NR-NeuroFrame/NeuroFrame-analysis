@@ -8,7 +8,7 @@ from scipy.ndimage import distance_transform_edt
 
 from .brain_mask import soften_edge
 
-from ..dataclass import Overlap
+from .overlap_dataclass import Overlap
 
 
 
