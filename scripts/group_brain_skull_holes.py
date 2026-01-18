@@ -17,7 +17,7 @@ from neuroframe_analysis import (Mouse, get_folders, get_holes,
 # ================================================================
 # 1. Section: Input
 # ================================================================
-REGION = "cerebellum"
+REGION = "global"
 
 
 
@@ -79,7 +79,7 @@ def process_regional_mouse(mouse_folder_name: str) -> tuple[str, float]:
 # ================================================================
 if __name__ == "__main__":
     folders = get_folders("data")
-    #folders = ['P324']
+    folders = ['P324']
 
     holes_volume_store = []
     results = []

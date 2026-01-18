@@ -6,7 +6,7 @@ import numpy as np
 from skimage.filters import threshold_otsu
 from scipy.ndimage import distance_transform_edt
 
-from .brain_mask import soften_edge
+from ..brain_mask import soften_edge
 
 from .overlap_dataclass import Overlap
 

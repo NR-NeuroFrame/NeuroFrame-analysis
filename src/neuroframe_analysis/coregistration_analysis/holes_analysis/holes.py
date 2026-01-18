@@ -5,9 +5,9 @@ import numpy as np
 
 from scipy.ndimage import distance_transform_edt, label, binary_fill_holes, center_of_mass
 
-from ..logger import logger
-from ..utils import get_volume_center, get_voxels_on_line
-from .overlap import get_local_skull
+from ...logger import logger
+from ...utils import get_volume_center, get_voxels_on_line
+from ..overlap_analysis.overlap import get_local_skull
 from .holes_dataclass import HolesDetails
 
 

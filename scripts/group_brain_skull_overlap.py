@@ -81,7 +81,7 @@ def process_regional_mouse(path: str, target: str = "isocortex") -> tuple[Overla
 # ================================================================
 if __name__ == "__main__":
     folders = get_folders("data")
-    #folders = ["P324"]
+    folders = ["P324"]
     overlap_per_store = []
 
     # 1. Iterates for all mice

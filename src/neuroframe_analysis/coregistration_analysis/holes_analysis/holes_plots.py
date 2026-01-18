@@ -3,7 +3,7 @@
 # ================================================================
 import numpy as np
 
-from ..plots import save_figure_protocol, SaveConfiguration, plot_group_vs_one_metric_bar
+from ...plots import SaveConfiguration, save_figure_protocol, plot_group_vs_one_metric_bar
 
 
 
