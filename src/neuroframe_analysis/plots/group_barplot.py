@@ -56,7 +56,7 @@ def plot_group_vs_one_metric_bar(data: np.ndarray,
     ax.set_ylabel(f"{metric_name} ({metric_type})")
     if(ylim is not None):
         ax.set_ylim(ylim)
-    ax.set_title("Study Group Brain-Skull {metric_name}")
+    ax.set_title(f"Study Group Brain-Skull {metric_name}")
 
     # 8. Finishing it
     fig.tight_layout()

@@ -24,7 +24,8 @@ def save_figure_protocol(func):
                 fig, ax = func(*args, **kwargs)
                 config = default_save_config
             except (ValueError, TypeError) as e:
-                logger.critical(f"{func.__name__} must return at least (fig, ax).")
+                result = func(*args, **kwargs)
+                logger.critical(f"{func.__name__} must return at least (fig, ax) and is returning {result}")
                 raise ValueError(f"{func.__name__} must return at least (fig, ax).") from e
 
         save_plot(fig, ax, config)
