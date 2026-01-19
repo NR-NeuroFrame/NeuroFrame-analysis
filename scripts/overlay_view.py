@@ -2,7 +2,6 @@
 # 0. Section: Imports
 # ================================================================
 from matplotlib import pyplot as plt
-import numpy as np
 
 from neuroframe_analysis import Mouse, plot_ct_mri_overlay, get_local_skull
 
@@ -33,8 +32,6 @@ if __name__ == "__main__":
     ct = mouse.micro_ct.data
     brain_mask = mouse.segmentation.data
     skull = get_local_skull(ct, brain_mask)
-
-    skull = np.where(skull > 0, 1, np.nan)
 
     # 2. Plot
     plot_ct_mri_overlay(mri, skull, MOUSE_ID, OFFSET, VIEW)

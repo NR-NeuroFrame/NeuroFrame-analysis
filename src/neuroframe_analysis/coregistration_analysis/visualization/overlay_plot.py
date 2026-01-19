@@ -33,7 +33,8 @@ def _ct_mri_overlay_config(mouse_id: str | None) -> SaveConfiguration:
     else: file_name = f"{mouse_id}_ct_mri_overlay_plot"
 
     config = SaveConfiguration(
-        file_name=file_name
+        file_name=file_name,
+        save_type='none'
     )
 
     return config

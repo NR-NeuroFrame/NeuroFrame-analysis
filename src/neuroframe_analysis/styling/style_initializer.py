@@ -6,7 +6,7 @@ import matplotlib.colors as mcolors
 
 from matplotlib import colormaps
 
-from .graphic_utils import tri_colormap
+from .colormaps import alpha_red_cmap_256, nr_cmap
 from .colors import (
     NR_RED,
     NR_LIGHT_RED,
@@ -49,5 +49,5 @@ mcolors.get_named_colors_mapping().update(NR_COLORS)
 # ================================================================
 # 3. Section: Colormaps Initialization
 # ================================================================
-rwy_trimap = tri_colormap('red_white_yellow', NR_RED, "#000000", NR_BLUE)
-colormaps.register(rwy_trimap, name="red_white_yellow")
+colormaps.register(nr_cmap, name="nr_cmap")
+colormaps.register(alpha_red_cmap_256, name="nr_red_transparent")
