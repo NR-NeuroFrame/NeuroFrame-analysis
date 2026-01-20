@@ -9,8 +9,10 @@ from matplotlib import pyplot as plt
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
 
-from neuroframe_analysis import (Mouse, get_folders, get_holes,
-    plot_group_hole_volume_bar, reduce_brain_segments, plot_regional_hole_volume_bar)
+from neuroframe_analysis import (
+    Mouse, get_folders, get_holes,
+    plot_group_hole_volume_bar, reduce_brain_segments, plot_regional_hole_volume_bar
+)
 
 
 

@@ -6,7 +6,7 @@ import matplotlib.colors as mcolors
 
 from matplotlib import colormaps
 
-from .colormaps import alpha_red_cmap_256, nr_cmap
+from .colormaps import alpha_red_cmap_256, nr_cmap, alpha_blue_cmap_256
 from .colors import (
     NR_RED,
     NR_LIGHT_RED,
@@ -51,3 +51,4 @@ mcolors.get_named_colors_mapping().update(NR_COLORS)
 # ================================================================
 colormaps.register(nr_cmap, name="nr_cmap")
 colormaps.register(alpha_red_cmap_256, name="nr_red_transparent")
+colormaps.register(alpha_blue_cmap_256, name="nr_blue_transparent")
