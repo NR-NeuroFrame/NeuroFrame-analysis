@@ -3,12 +3,15 @@
 # ================================================================
 from matplotlib import pyplot as plt
 
-from neuroframe_analysis import (
-    Mouse, plot_ct_mri_overlay, get_local_skull, get_holes,
-    get_overlap, plot_ct_mri_effect_overlay_zoom
+from neuroframe_analysis.mouse import Mouse
+from neuroframe_analysis.plots import Bounds
+from neuroframe_analysis.coregistration_analysis import(
+    plot_ct_mri_overlay,
+    plot_ct_mri_effect_overlay_zoom,
+    get_overlap,
+    get_holes,
+    get_local_skull
 )
-
-from neuroframe_analysis.plots.plot_dataclass import Bounds
 
 
 

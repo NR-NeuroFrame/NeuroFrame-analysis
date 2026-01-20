@@ -7,10 +7,15 @@ import pandas as pd
 
 from matplotlib import pyplot as plt
 
-from neuroframe_analysis import (Mouse, Overlap,
-    get_overlap, get_folders,
-    plot_group_overlap_bar, plot_regional_overlap_bar,
-    reduce_brain_segments)
+from neuroframe_analysis import get_folders
+from neuroframe_analysis.mouse import Mouse
+from neuroframe_analysis.coregistration_analysis import (
+    Overlap,
+    get_overlap,
+    reduce_brain_segments,
+    plot_group_overlap_bar,
+    plot_regional_overlap_bar
+)
 
 
 

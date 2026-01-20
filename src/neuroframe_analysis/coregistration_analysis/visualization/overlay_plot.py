@@ -91,6 +91,7 @@ def _ct_mri_effect_overlay_config(effect: str, mouse_id: str | None = None) -> S
 
     config = SaveConfiguration(
         file_name=file_name,
+        save_type='none'
     )
 
     return config
