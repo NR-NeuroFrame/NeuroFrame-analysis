@@ -209,3 +209,9 @@ __marimo__/
 .DS_Store/
 *.DS_Store
 .DS_Store
+verbose.txt
+data/
+archive/
+figures/
+pyrightconfig.json
+logs/
